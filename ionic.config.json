@@ -1,0 +1,7 @@
+{
+  "name": "appschool",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
