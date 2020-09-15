@@ -1,0 +1,17 @@
+.my-custom-class {
+    --background: #222;
+      border-radius: 10px;
+  }
+
+.btn{
+      margin-right: 16px;
+    --padding-end:16px;
+}  
+
+.title{
+    font-size: 22px;
+    text-align: center;
+}
+.label{
+    margin: 10px;
+}
