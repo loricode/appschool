@@ -2,7 +2,7 @@ import { IonContent,IonHeader, IonPage,IonCardContent,IonList,
          IonModal, IonTitle, IonToolbar,IonCardTitle,IonLabel,IonAvatar,
          IonButton, IonInput,IonItem,IonCard,IonFabButton,IonIcon,
          IonItemSliding,IonItemOptions,IonItemOption,
-         useIonViewWillEnter } from '@ionic/react';
+         useIonViewWillEnter,IonAlert } from '@ionic/react';
 
 import React,{ useState } from 'react';
 import { add, trash, pencil, person, close } from 'ionicons/icons';
@@ -16,7 +16,9 @@ const Home: React.FC = () => {
   const [nombre , setNombre] = useState('')
   const [apellido, setApellido] = useState('')
   const [avatar, setAvatar] = useState('') 
-  
+  const [showAlert, setShowAlert] = useState(false) 
+  const [id, setId] = useState('') 
+ 
   useIonViewWillEnter(() => {
     getStudents()
 })
@@ -46,6 +48,18 @@ function clearInputs(){
   
 }
 
+ function deleteStudent(id:string){
+    setId(id)
+    setShowAlert(true)
+} 
+
+async function handlerDelete(){
+  const response = await fetch(uri+"/"+id, {method:'DELETE'})
+  const result = await response.json();
+  console.log(result)
+  setId('')
+  getStudents()
+}
 
   return (
     <IonPage>
@@ -89,6 +103,23 @@ function clearInputs(){
         </IonCard>
       </IonModal>
 
+      <IonAlert
+          isOpen={showAlert}
+          onDidDismiss={() => setShowAlert(false)}
+          cssClass='my-custom-class'
+          header={'Confirm!'}
+          message={'<strong>Seguro que quieres elimarlo</strong>!!!'}
+          buttons={[
+            {
+              text: 'Cancel',
+              role: 'cancel',
+              cssClass: 'secondary',
+              handler: () => { setShowAlert(false); setId('') }
+            },
+            { text: 'Okay', handler: handlerDelete }
+          ]}
+        />
+
       <IonList>
         {  listStudents.map(student => (
          <IonItemSliding key={student.id} >       
@@ -101,7 +132,7 @@ function clearInputs(){
           
           <IonItemOptions side="end">
              <IonItemOption color="ligth"
-                 onClick={() => console.log("delete")}>
+                 onClick={() => deleteStudent(student.id+"")}>
                 <IonFabButton size="small" color="danger">
                    <IonIcon icon={trash} />
                 </IonFabButton>
