@@ -18,7 +18,9 @@ const Home: React.FC = () => {
   const [avatar, setAvatar] = useState('') 
   const [showAlert, setShowAlert] = useState(false) 
   const [id, setId] = useState('') 
- 
+  const [updateOrAdd, setUpdateOrAdd]=useState(false)
+
+
   useIonViewWillEnter(() => {
     getStudents()
 })
@@ -42,6 +44,7 @@ async function addStudent(){
 }
 
 function clearInputs(){
+  setId('')
   setNombre('')
   setApellido('')
   setAvatar('')
@@ -60,6 +63,36 @@ async function handlerDelete(){
   setId('')
   getStudents()
 }
+
+
+async function getStudent(idS:string) {
+  const response = await fetch(uri+"/"+idS);
+  const result = await response.json();
+  const {id, nombre, apellido, url } = result.student
+  setId(id)
+  setNombre(nombre)
+  setApellido(apellido)
+  setAvatar(url)
+  setUpdateOrAdd(true)
+  setShowModal(true)
+
+}
+
+async function UpdateStudent(){
+  const formData = new FormData();
+  formData.append("id",id)
+  formData.append('nombre', nombre);
+  formData.append('apellido', apellido);
+  formData.append('url', avatar);
+  const response = await fetch(uri+"/update" ,{ method:'POST', body:formData })
+  const result = await response.json();
+  console.log(result)
+  getStudents()
+  clearInputs()
+  setUpdateOrAdd(false)
+  
+}
+
 
   return (
     <IonPage>
@@ -93,7 +126,7 @@ async function handlerDelete(){
              onIonChange={e => setAvatar(e.detail.value!)} clearInput/>
             </IonItem>
             <IonButton expand="block" fill="outline" 
-                onClick={addStudent}>
+                onClick={ updateOrAdd? UpdateStudent:addStudent }>
                   <IonIcon icon={person} /></IonButton>
 
             <IonButton expand="block" fill="outline" color="danger"
@@ -139,7 +172,7 @@ async function handlerDelete(){
           </IonItemOption>
 
           <IonItemOption color="ligth"
-              onClick={() => console.log("update")}>
+              onClick={() => getStudent(student.id+"")}>
             <IonFabButton size="small" color="secondary">
                <IonIcon icon={pencil} />
             </IonFabButton>
